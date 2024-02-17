@@ -1,0 +1,39 @@
+version: '3.9'
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  keycloak-network:
+    driver: bridge
+
+services:
+  mysql:
+    image: mysql:8.0.36
+    environment:
+      MYSQL_ROOT_PASSWORD: sqlkeycloak
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+    ports:
+      - 3366:3306
+    networks:
+      - keycloak-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:legacy
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: keycloakpassword
+    ports:
+      - 8090:8080
+    networks:
+      - keycloak-network
+    depends_on:
+      - mysql
